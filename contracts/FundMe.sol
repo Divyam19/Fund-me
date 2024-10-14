@@ -16,9 +16,32 @@ contract FundMe{
         addressToAmountFunded[msg.sender] = addressToAmountFunded[msg.sender] + msg.value;
 
     }
+
+    address public owner ;
+
+    constructor() {
+        owner = msg.sender;    
+    }
     
     
-    //function withdraw() public {}
+    function withdraw() public   {
+        require(msg.sender == owner, "Must be owner!");
+        for(uint256 i = 0 ; i<funders.length ; i++){
+            address funder = funders[i];
+            addressToAmountFunded[funder] = 0;
+        }
+        funders = new address[](0);
+
+        // transfer
+        // payable (msg.sender).transfer(address(this).balance);
+        // // send
+        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        // require(sendSuccess ,"failed to send funds to user");
+
+        // call
+        (bool callSuccess , ) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess,"Call Faliure");
+    }
     
 
 }
